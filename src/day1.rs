@@ -1,11 +1,39 @@
+use std::collections::HashMap;
+use std::iter;
 use aoc_runner_derive::aoc;
 
 #[aoc(day1, part1)]
-fn part1(input: &str) -> i32 {
-    todo!()
+fn part1(input: &str) -> u32 {
+    let mut list1 = Vec::with_capacity(1000);
+    let mut list2 = Vec::with_capacity(1000);
+    for line in input.lines() {
+        let mut cols = line.split_ascii_whitespace();
+        let a = cols.next().unwrap().parse::<u32>().unwrap();
+        let b = cols.next().unwrap().parse::<u32>().unwrap();
+
+        list1.push(a);
+        list2.push(b);
+    }
+
+    list1.sort_unstable();
+    list2.sort_unstable();
+
+    iter::zip(&list1, &list2).map(|(a, b)| a.abs_diff(*b)).sum()
 }
 
 #[aoc(day1, part2)]
-fn part2(input: &str) -> i32 {
-    todo!()
+fn part2(input: &str) -> u32 {
+    let mut list1 = Vec::with_capacity(1000);
+    let mut counts = HashMap::new();
+
+    for line in input.lines() {
+        let mut cols = line.split_ascii_whitespace();
+        let a = cols.next().unwrap().parse::<u32>().unwrap();
+        let b = cols.next().unwrap().parse::<u32>().unwrap();
+
+        list1.push(a);
+        counts.entry(b).and_modify(|x| *x += 1).or_insert(1);
+    }
+
+    list1.iter().map(|x| *x * counts.get(x).copied().unwrap_or(0)).sum()
 }
