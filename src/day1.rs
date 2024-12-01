@@ -6,10 +6,9 @@ use aoc_runner_derive::aoc;
 fn part1(input: &str) -> u32 {
     let mut list1 = Vec::with_capacity(1000);
     let mut list2 = Vec::with_capacity(1000);
-    for line in input.lines() {
-        let mut cols = line.split_ascii_whitespace();
-        let a = cols.next().unwrap().parse::<u32>().unwrap();
-        let b = cols.next().unwrap().parse::<u32>().unwrap();
+    for [a, b] in input.split_ascii_whitespace().array_chunks() {
+        let a = a.parse::<u32>().unwrap();
+        let b = b.parse::<u32>().unwrap();
 
         list1.push(a);
         list2.push(b);
@@ -26,10 +25,9 @@ fn part2(input: &str) -> u32 {
     let mut list1 = Vec::with_capacity(1000);
     let mut counts = HashMap::new();
 
-    for line in input.lines() {
-        let mut cols = line.split_ascii_whitespace();
-        let a = cols.next().unwrap().parse::<u32>().unwrap();
-        let b = cols.next().unwrap().parse::<u32>().unwrap();
+    for [a, b] in input.split_ascii_whitespace().array_chunks() {
+        let a = a.parse::<u32>().unwrap();
+        let b = b.parse::<u32>().unwrap();
 
         list1.push(a);
         counts.entry(b).and_modify(|x| *x += 1).or_insert(1);
