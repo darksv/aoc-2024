@@ -7,7 +7,7 @@ enum Order {
 }
 
 #[aoc(day2, part1)]
-fn part1(input: &str) -> u32 {
+pub fn part1(input: &str) -> u32 {
     let mut safe_count = 0;
     for line in input.lines() {
         let numbers: arrayvec::ArrayVec<_, 10> = line
@@ -24,7 +24,7 @@ fn part1(input: &str) -> u32 {
 }
 
 #[aoc(day2, part2)]
-fn part2(input: &str) -> u32 {
+pub fn part2(input: &str) -> u32 {
     let mut safe_count = 0;
     'main: for line in input.lines() {
         let original_numbers: arrayvec::ArrayVec<_, 10> = line

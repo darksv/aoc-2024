@@ -3,7 +3,7 @@ use std::iter;
 use aoc_runner_derive::aoc;
 
 #[aoc(day1, part1)]
-fn part1(input: &str) -> u32 {
+pub fn part1(input: &str) -> u32 {
     let mut list1 = Vec::with_capacity(1000);
     let mut list2 = Vec::with_capacity(1000);
     for [a, b] in input.split_ascii_whitespace().array_chunks() {
@@ -21,7 +21,7 @@ fn part1(input: &str) -> u32 {
 }
 
 #[aoc(day1, part2)]
-fn part2(input: &str) -> u32 {
+pub fn part2(input: &str) -> u32 {
     let mut list1 = Vec::with_capacity(1000);
     let mut counts = HashMap::new();
 
