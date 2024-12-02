@@ -1,6 +1,7 @@
 #![feature(iter_array_chunks)]
 #![feature(unsigned_signed_diff)]
 #![feature(array_windows)]
+#![feature(iter_map_windows)]
 
 pub mod day1;
 pub mod day2;
