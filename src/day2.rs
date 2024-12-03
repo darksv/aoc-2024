@@ -10,12 +10,12 @@ enum Order {
 pub fn part1(input: &str) -> u32 {
     let mut safe_count = 0;
     for line in input.lines() {
-        let numbers = line
+        let numbers: arrayvec::ArrayVec<_, 10> = line
             .split_ascii_whitespace()
             .map(|x| x.parse::<u32>().unwrap())
-            .map_windows(|&[x, y]| x.checked_signed_diff(y).unwrap());
+            .collect();
 
-        if first_invalid(numbers).is_none() {
+        if first_invalid(&numbers).is_none() {
             safe_count += 1;
         }
     }
@@ -30,14 +30,13 @@ pub fn part2(input: &str) -> u32 {
         let original_numbers: arrayvec::ArrayVec<_, 10> = line
             .split_ascii_whitespace()
             .map(|x| x.parse::<u32>().unwrap())
-            .map_windows(|&[x, y]| x.checked_signed_diff(y).unwrap())
             .collect();
 
-        if let Some(_) = first_invalid(original_numbers.iter().copied()) {
+        if let Some(_) = first_invalid(&original_numbers) {
             for offset in 0..original_numbers.len() {
                 let mut numbers = original_numbers.clone();
                 numbers.remove(offset);
-                if first_invalid(numbers.iter().copied()).is_none() {
+                if first_invalid(&numbers).is_none() {
                     safe_count += 1;
                     continue 'main;
                 }
@@ -52,9 +51,10 @@ pub fn part2(input: &str) -> u32 {
 }
 
 
-fn first_invalid(diffs: impl Iterator<Item=i32>) -> Option<usize> {
+fn first_invalid(numbers: &[u32]) -> Option<usize> {
     let mut dir = None;
-    for (idx, diff) in diffs.enumerate() {
+    for (idx, &[a, b]) in numbers.array_windows().enumerate() {
+        let diff = a.checked_signed_diff(b).unwrap();
         match diff.abs() {
             1..=3 => (),
             _ => return Some(idx),
