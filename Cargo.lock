@@ -10,6 +10,7 @@ dependencies = [
  "aoc-runner-derive",
  "arrayvec",
  "atoi_simd",
+ "memchr",
 ]
 
 [[package]]

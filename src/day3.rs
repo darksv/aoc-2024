@@ -53,6 +53,12 @@ pub fn part2(input: &str) -> u32 {
     let mut rest = input;
     let mut enabled = true;
     loop {
+        if let Some(idx) = memchr::memchr2(b'd', b'm', rest.as_bytes()) {
+            rest = &rest[idx..];
+        } else {
+            break;
+        }
+
         let (op, idx) = if !enabled {
             // fast skip to mul enable op
             if let Some(idx) = rest.find("do()") {
