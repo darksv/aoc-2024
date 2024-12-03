@@ -40,6 +40,12 @@ fn parse_mul(input: &str, offset: usize) -> (Option<u32>, &str) {
     return (None, rest);
 }
 
+enum Op {
+    Do,
+    Dont,
+    Mul,
+}
+
 #[aoc(day3, part2)]
 pub fn part2(input: &str) -> u32 {
     let mut sum = 0;
@@ -50,69 +56,62 @@ pub fn part2(input: &str) -> u32 {
         let do_idx = rest.find("do()");
         let dont_idx = rest.find("don't()");
 
-        match (mul_idx, do_idx, dont_idx) {
+        let op = match (mul_idx, do_idx, dont_idx) {
+            (Some(0), _, _) => Op::Mul,
+            (_, Some(0), _) => Op::Do,
+            (_, _, Some(0)) => Op::Dont,
             (Some(mul_idx), Some(do_idx), Some(dont_idx)) => {
                 if mul_idx < do_idx && mul_idx < dont_idx {
-                    let (mul, r) = parse_mul(rest, mul_idx);
-                    if let Some(mul) = mul {
-                        if enabled {
-                            sum += mul;
-                        }
-                    }
-                    rest = r;
+                    Op::Mul
                 } else if do_idx < mul_idx && do_idx < dont_idx {
-                    rest = &rest[do_idx + 4..];
-                    enabled = true;
-                    continue;
-                } else if dont_idx < mul_idx && dont_idx < do_idx {
-                    rest = &rest[dont_idx + 6..];
-                    enabled = false;
-                    continue;
+                    Op::Do
+                } else {
+                    Op::Dont
                 }
             }
             (None, Some(do_idx), Some(dont_idx)) => {
                 if do_idx < dont_idx {
-                    rest = &rest[do_idx + 4..];
-                    enabled = true;
-                    continue;
+                    Op::Do
                 } else {
-                    rest = &rest[dont_idx + 6..];
-                    enabled = false;
-                    continue;
+                    Op::Dont
                 }
             }
             (Some(mul_idx), None, Some(dont_idx)) => {
                 if mul_idx < dont_idx {
-                    let (mul, r) = parse_mul(rest, mul_idx);
-                    if let Some(mul) = mul {
-                        if enabled {
-                            sum += mul;
-                        }
-                    }
-                    rest = r;
+                    Op::Mul
                 } else {
-                    rest = &rest[mul_idx + 6..];
-                    enabled = false;
-                    continue;
+                    Op::Dont
                 }
             }
             (Some(mul_idx), Some(do_idx), None) => {
                 if mul_idx < do_idx {
-                    let (mul, r) = parse_mul(rest, mul_idx);
-                    if let Some(mul) = mul {
-                        if enabled {
-                            sum += mul;
-                        }
-                    }
-                    rest = r;
+                    Op::Mul
                 } else {
-                    rest = &rest[do_idx + 4..];
-                    enabled = true;
-                    continue;
+                    Op::Do
                 }
             }
             (Some(_), None, None) if !enabled => break,
             _ => break,
+        };
+
+        match op {
+            Op::Do => {
+                rest = &rest[do_idx.unwrap() + 4..];
+                enabled = true;
+            }
+            Op::Dont => {
+                rest = &rest[dont_idx.unwrap() + 6..];
+                enabled = false;
+            }
+            Op::Mul => {
+                let (mul, r) = parse_mul(rest, mul_idx.unwrap());
+                if let Some(mul) = mul {
+                    if enabled {
+                        sum += mul;
+                    }
+                }
+                rest = r;
+            }
         }
     }
 
