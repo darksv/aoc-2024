@@ -40,6 +40,7 @@ fn parse_mul(input: &str, offset: usize) -> (Option<u32>, &str) {
     return (None, rest);
 }
 
+#[derive(Clone, Copy)]
 enum Op {
     Do,
     Dont,
@@ -52,59 +53,71 @@ pub fn part2(input: &str) -> u32 {
     let mut rest = input;
     let mut enabled = true;
     loop {
-        let mul_idx = rest.find("mul(");
-        let do_idx = rest.find("do()");
-        let dont_idx = rest.find("don't()");
+        let (op, idx) = if !enabled {
+            // fast skip to mul enable op
+            if let Some(idx) = rest.find("do()") {
+                (Op::Do, idx)
+            } else {
+                break;
+            }
+        } else {
+            let mul_idx = rest.find("mul(");
+            if mul_idx.is_none() {
+                // no more muls
+                break;
+            }
 
-        let op = match (mul_idx, do_idx, dont_idx) {
-            (Some(0), _, _) => Op::Mul,
-            (_, Some(0), _) => Op::Do,
-            (_, _, Some(0)) => Op::Dont,
-            (Some(mul_idx), Some(do_idx), Some(dont_idx)) => {
-                if mul_idx < do_idx && mul_idx < dont_idx {
-                    Op::Mul
-                } else if do_idx < mul_idx && do_idx < dont_idx {
-                    Op::Do
-                } else {
-                    Op::Dont
+            let dont_idx = rest.find("don't()");
+            let do_idx = rest.find("do()");
+
+            let op = match (mul_idx, do_idx, dont_idx) {
+                (Some(0), _, _) => Op::Mul,
+                (_, Some(0), _) => Op::Do,
+                (_, _, Some(0)) => Op::Dont,
+                (Some(mul_idx), Some(do_idx), Some(dont_idx)) => {
+                    if mul_idx < do_idx && mul_idx < dont_idx {
+                        Op::Mul
+                    } else if do_idx < mul_idx && do_idx < dont_idx {
+                        Op::Do
+                    } else {
+                        Op::Dont
+                    }
                 }
-            }
-            (None, Some(do_idx), Some(dont_idx)) => {
-                if do_idx < dont_idx {
-                    Op::Do
-                } else {
-                    Op::Dont
+                (Some(mul_idx), None, Some(dont_idx)) => {
+                    if mul_idx < dont_idx {
+                        Op::Mul
+                    } else {
+                        Op::Dont
+                    }
                 }
-            }
-            (Some(mul_idx), None, Some(dont_idx)) => {
-                if mul_idx < dont_idx {
-                    Op::Mul
-                } else {
-                    Op::Dont
+                (Some(mul_idx), Some(do_idx), None) => {
+                    if mul_idx < do_idx {
+                        Op::Mul
+                    } else {
+                        Op::Do
+                    }
                 }
-            }
-            (Some(mul_idx), Some(do_idx), None) => {
-                if mul_idx < do_idx {
-                    Op::Mul
-                } else {
-                    Op::Do
-                }
-            }
-            (Some(_), None, None) if !enabled => break,
-            _ => break,
+                _ => unreachable!(),
+            };
+
+            (op, match op {
+                Op::Do => do_idx,
+                Op::Dont => dont_idx,
+                Op::Mul => mul_idx
+            }.unwrap())
         };
 
         match op {
             Op::Do => {
-                rest = &rest[do_idx.unwrap() + 4..];
+                rest = &rest[idx + 4..];
                 enabled = true;
             }
             Op::Dont => {
-                rest = &rest[dont_idx.unwrap() + 6..];
+                rest = &rest[idx + 6..];
                 enabled = false;
             }
             Op::Mul => {
-                let (mul, r) = parse_mul(rest, mul_idx.unwrap());
+                let (mul, r) = parse_mul(rest, idx);
                 if let Some(mul) = mul {
                     if enabled {
                         sum += mul;
