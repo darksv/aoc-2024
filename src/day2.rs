@@ -9,8 +9,8 @@ enum Order {
 #[aoc(day2, part1)]
 pub fn part1(input: &str) -> u32 {
     let mut safe_count = 0;
-    for line in input.lines() {
-        let numbers: arrayvec::ArrayVec<_, 10> = line
+    for line in input.split_terminator('\n') {
+        let numbers: arrayvec::ArrayVec<_, 8> = line
             .split_ascii_whitespace()
             .map(|x| x.parse::<u32>().unwrap())
             .collect();
@@ -26,8 +26,8 @@ pub fn part1(input: &str) -> u32 {
 #[aoc(day2, part2)]
 pub fn part2(input: &str) -> u32 {
     let mut safe_count = 0;
-    'main: for line in input.lines() {
-        let original_numbers: arrayvec::ArrayVec<_, 10> = line
+    'main: for line in input.split_terminator('\n') {
+        let original_numbers: arrayvec::ArrayVec<_, 8> = line
             .split_ascii_whitespace()
             .map(|x| x.parse::<u32>().unwrap())
             .collect();
@@ -56,7 +56,7 @@ fn first_invalid(numbers: &[u32]) -> Option<usize> {
     for (idx, &[a, b]) in numbers.array_windows().enumerate() {
         let diff = a.checked_signed_diff(b).unwrap();
         match diff.abs() {
-            1..=3 => (),
+            1..4 => (),
             _ => return Some(idx),
         }
         let order = if diff > 0 {
